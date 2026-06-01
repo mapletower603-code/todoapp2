@@ -4,9 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Plus, CheckCircle2, Circle, Trash2, Pencil, X, Check, CalendarDays, Flag, LayoutList } from "lucide-react";
 import { format, isPast, isToday, isTomorrow, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
+import { supabase } from "@/lib/supabase";
 import type { Todo, Priority, FilterType } from "@/types/todo";
-
-const STORAGE_KEY = "todo-app-tasks";
 
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string; bg: string; dot: string }> = {
   high: { label: "高", color: "text-rose-600", bg: "bg-rose-50 border-rose-200", dot: "bg-rose-500" },
@@ -35,6 +34,7 @@ export default function TodoApp() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [newTitle, setNewTitle] = useState("");
   const [newDeadline, setNewDeadline] = useState("");
@@ -44,19 +44,36 @@ export default function TodoApp() {
   const [editDeadline, setEditDeadline] = useState("");
   const [editPriority, setEditPriority] = useState<Priority>("medium");
 
+  // Supabaseからデータ取得
+  const fetchTodos = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("todos")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error && data) {
+      setTodos(data as Todo[]);
+    }
+    setLoading(false);
+  }, []);
+
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) setTodos(JSON.parse(stored));
-    } catch {}
-  }, []);
+    fetchTodos();
 
-  const saveTodos = useCallback((updated: Todo[]) => {
-    setTodos(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  }, []);
+    // リアルタイム更新
+    const channel = supabase
+      .channel("todos-channel")
+      .on("postgres_changes", { event: "*", schema: "public", table: "todos" }, () => {
+        fetchTodos();
+      })
+      .subscribe();
 
-  const addTodo = () => {
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchTodos]);
+
+  const addTodo = async () => {
     if (!newTitle.trim()) return;
     const todo: Todo = {
       id: generateId(),
@@ -66,19 +83,30 @@ export default function TodoApp() {
       priority: newPriority,
       createdAt: new Date().toISOString(),
     };
-    saveTodos([todo, ...todos]);
+    await supabase.from("todos").insert({
+      id: todo.id,
+      title: todo.title,
+      completed: todo.completed,
+      deadline: todo.deadline,
+      priority: todo.priority,
+      created_at: todo.createdAt,
+    });
     setNewTitle("");
     setNewDeadline("");
     setNewPriority("medium");
     setShowForm(false);
   };
 
-  const toggleTodo = (id: string) => {
-    saveTodos(todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
+  const toggleTodo = async (id: string) => {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
+    await supabase.from("todos").update({ completed: !todo.completed }).eq("id", id);
+    setTodos(todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
   };
 
-  const deleteTodo = (id: string) => {
-    saveTodos(todos.filter((t) => t.id !== id));
+  const deleteTodo = async (id: string) => {
+    await supabase.from("todos").delete().eq("id", id);
+    setTodos(todos.filter((t) => t.id !== id));
   };
 
   const startEdit = (todo: Todo) => {
@@ -88,9 +116,13 @@ export default function TodoApp() {
     setEditPriority(todo.priority);
   };
 
-  const saveEdit = () => {
+  const saveEdit = async () => {
     if (!editTitle.trim() || !editingId) return;
-    saveTodos(
+    await supabase
+      .from("todos")
+      .update({ title: editTitle.trim(), deadline: editDeadline || null, priority: editPriority })
+      .eq("id", editingId);
+    setTodos(
       todos.map((t) =>
         t.id === editingId
           ? { ...t, title: editTitle.trim(), deadline: editDeadline || null, priority: editPriority }
@@ -102,6 +134,12 @@ export default function TodoApp() {
 
   const cancelEdit = () => setEditingId(null);
 
+  const deleteCompleted = async () => {
+    const completedIds = todos.filter((t) => t.completed).map((t) => t.id);
+    await supabase.from("todos").delete().in("id", completedIds);
+    setTodos(todos.filter((t) => !t.completed));
+  };
+
   const filtered = todos.filter((t) => {
     if (filter === "active") return !t.completed;
     if (filter === "completed") return t.completed;
@@ -111,7 +149,9 @@ export default function TodoApp() {
   const stats = {
     total: todos.length,
     completed: todos.filter((t) => t.completed).length,
-    overdue: todos.filter((t) => !t.completed && t.deadline && isPast(parseISO(t.deadline)) && !isToday(parseISO(t.deadline))).length,
+    overdue: todos.filter(
+      (t) => !t.completed && t.deadline && isPast(parseISO(t.deadline)) && !isToday(parseISO(t.deadline))
+    ).length,
   };
 
   const today = format(new Date(), "yyyy-MM-dd");
@@ -152,9 +192,7 @@ export default function TodoApp() {
                   key={f}
                   onClick={() => setFilter(f)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    filter === f
-                      ? "bg-white text-blue-600 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
+                    filter === f ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   {f === "all" ? "すべて" : f === "active" ? "未完了" : "完了済み"}
@@ -228,7 +266,12 @@ export default function TodoApp() {
 
           {/* Todo list */}
           <div className="divide-y divide-gray-50">
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div className="py-16 text-center text-gray-400">
+                <div className="text-4xl mb-3">⏳</div>
+                <p className="text-sm">読み込み中...</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="py-16 text-center text-gray-400">
                 <div className="text-4xl mb-3">
                   {filter === "completed" ? "🎉" : "📝"}
@@ -376,7 +419,7 @@ export default function TodoApp() {
               </span>
               {stats.completed > 0 && (
                 <button
-                  onClick={() => saveTodos(todos.filter((t) => !t.completed))}
+                  onClick={deleteCompleted}
                   className="text-xs text-gray-400 hover:text-rose-500 transition-colors"
                 >
                   完了済みを削除
@@ -386,7 +429,7 @@ export default function TodoApp() {
           )}
         </div>
 
-        <p className="text-center text-white/40 text-xs mt-6">データはブラウザに保存されます</p>
+        <p className="text-center text-white/40 text-xs mt-6">データはクラウドに保存されます</p>
       </div>
     </div>
   );
