@@ -229,7 +229,7 @@ export default function TodoApp({ session }: { session: Session }) {
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addTodo()}
+                  onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && addTodo()}
                   placeholder="タスクを入力..."
                   autoFocus
                   className="w-full px-4 py-2.5 rounded-xl border border-blue-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -316,7 +316,7 @@ export default function TodoApp({ session }: { session: Session }) {
                           type="text"
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
+                          onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) saveEdit(); if (e.key === "Escape") cancelEdit(); }}
                           autoFocus
                           className="w-full px-4 py-2.5 rounded-xl border border-blue-300 bg-blue-50 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
