@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, CheckCircle2, Circle, Trash2, Pencil, X, Check, CalendarDays, Flag, LayoutList } from "lucide-react";
+import { Plus, CheckCircle2, Circle, Trash2, Pencil, X, Check, CalendarDays, Flag, LayoutList, LogOut } from "lucide-react";
 import { format, isPast, isToday, isTomorrow, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
 import { supabase } from "@/lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 import type { Todo, Priority, FilterType } from "@/types/todo";
 
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string; bg: string; dot: string }> = {
@@ -29,7 +30,7 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-export default function TodoApp() {
+export default function TodoApp({ session }: { session: Session }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
   const [showForm, setShowForm] = useState(false);
@@ -90,6 +91,7 @@ export default function TodoApp() {
       deadline: todo.deadline,
       priority: todo.priority,
       created_at: todo.createdAt,
+      user_id: session.user.id,
     });
     if (error) return;
     setNewTitle("");
@@ -167,6 +169,16 @@ export default function TodoApp() {
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">タスク管理</h1>
           <p className="text-white/70 mt-1 text-sm">今日もひとつずつ、着実に。</p>
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <span className="text-white/60 text-xs">{session.user.email}</span>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="flex items-center gap-1 text-white/60 hover:text-white text-xs transition-colors"
+            >
+              <LogOut className="w-3 h-3" />
+              ログアウト
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
