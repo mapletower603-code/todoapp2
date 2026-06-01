@@ -51,7 +51,6 @@ export default function TodoApp() {
       .from("todos")
       .select("*")
       .order("created_at", { ascending: false });
-    console.log("fetchTodos data:", JSON.stringify(data), "error:", JSON.stringify(error));
     if (!error && data) {
       setTodos(data as Todo[]);
     }
@@ -92,10 +91,7 @@ export default function TodoApp() {
       priority: todo.priority,
       created_at: todo.createdAt,
     });
-    if (error) {
-      console.error("Supabase insert error:", error.message, error.details, error.hint);
-      return;
-    }
+    if (error) return;
     setNewTitle("");
     setNewDeadline("");
     setNewPriority("medium");
