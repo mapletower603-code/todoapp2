@@ -98,18 +98,19 @@ export default function TodoApp({ session }: { session: Session }) {
     setNewDeadline("");
     setNewPriority("medium");
     setShowForm(false);
+    fetchTodos();
   };
 
   const toggleTodo = async (id: string) => {
     const todo = todos.find((t) => t.id === id);
     if (!todo) return;
     await supabase.from("todos").update({ completed: !todo.completed }).eq("id", id);
-    setTodos(todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
+    fetchTodos();
   };
 
   const deleteTodo = async (id: string) => {
     await supabase.from("todos").delete().eq("id", id);
-    setTodos(todos.filter((t) => t.id !== id));
+    fetchTodos();
   };
 
   const startEdit = (todo: Todo) => {
@@ -125,14 +126,8 @@ export default function TodoApp({ session }: { session: Session }) {
       .from("todos")
       .update({ title: editTitle.trim(), deadline: editDeadline || null, priority: editPriority })
       .eq("id", editingId);
-    setTodos(
-      todos.map((t) =>
-        t.id === editingId
-          ? { ...t, title: editTitle.trim(), deadline: editDeadline || null, priority: editPriority }
-          : t
-      )
-    );
     setEditingId(null);
+    fetchTodos();
   };
 
   const cancelEdit = () => setEditingId(null);
@@ -140,7 +135,7 @@ export default function TodoApp({ session }: { session: Session }) {
   const deleteCompleted = async () => {
     const completedIds = todos.filter((t) => t.completed).map((t) => t.id);
     await supabase.from("todos").delete().in("id", completedIds);
-    setTodos(todos.filter((t) => !t.completed));
+    fetchTodos();
   };
 
   const filtered = todos.filter((t) => {
