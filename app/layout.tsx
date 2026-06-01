@@ -10,6 +10,11 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: "タスク管理",
   description: "シンプルで使いやすいタスク管理アプリ",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "タスク管理",
+  },
 };
 
 export default function RootLayout({
