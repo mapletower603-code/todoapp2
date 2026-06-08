@@ -10,7 +10,7 @@
 
 body {
   font-family: var(--font-geist), "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-  background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%);
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
   min-height: 100vh;
 }
 
