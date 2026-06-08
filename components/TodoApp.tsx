@@ -51,6 +51,7 @@ export default function TodoApp({ session }: { session: Session }) {
     const { data, error } = await supabase
       .from("todos")
       .select("*")
+      .order("deadline", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
     if (!error && data) {
       setTodos(data as Todo[]);
