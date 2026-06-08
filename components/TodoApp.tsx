@@ -180,7 +180,7 @@ export default function TodoApp({ session }: { session: Session }) {
         {/* Stats */}
         <div className="flex justify-center gap-3 mb-5 animate-fade-in">
           {[
-            { label: "合計", value: stats.total, color: "text-slate-600" },
+            { label: "合計", value: stats.total, color: "text-[#5b7a95]" },
             { label: "完了", value: stats.completed, color: "text-emerald-600" },
             { label: "期限切れ", value: stats.overdue, color: "text-rose-600" },
           ].map((s) => (
@@ -201,7 +201,7 @@ export default function TodoApp({ session }: { session: Session }) {
                   key={f}
                   onClick={() => setFilter(f)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    filter === f ? "bg-white text-slate-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                    filter === f ? "bg-white text-[#5b7a95] shadow-sm" : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   {f === "all" ? "すべて" : f === "active" ? "未完了" : "完了済み"}
@@ -210,7 +210,7 @@ export default function TodoApp({ session }: { session: Session }) {
             </div>
             <button
               onClick={() => { setShowForm(!showForm); setEditingId(null); }}
-              className="flex items-center gap-1.5 bg-slate-600 hover:bg-slate-700 text-white text-xs font-medium px-4 py-2 rounded-xl transition-colors shadow-sm"
+              className="flex items-center gap-1.5 btn-accent  text-white text-xs font-medium px-4 py-2 rounded-xl transition-colors shadow-sm"
             >
               <Plus className="w-3.5 h-3.5" />
               タスク追加
@@ -219,7 +219,7 @@ export default function TodoApp({ session }: { session: Session }) {
 
           {/* Add form */}
           {showForm && (
-            <div className="px-5 py-4 bg-slate-50/60 border-b border-slate-100 animate-slide-in">
+            <div className="px-5 py-4 bg-gray-50/60 border-b border-gray-100 animate-slide-in">
               <div className="space-y-3">
                 <input
                   type="text"
@@ -228,25 +228,25 @@ export default function TodoApp({ session }: { session: Session }) {
                   onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && addTodo()}
                   placeholder="タスクを入力..."
                   autoFocus
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5b7a95]"
                 />
                 <div className="flex gap-3">
                   <div className="flex items-center gap-2 flex-1">
-                    <CalendarDays className="w-4 h-4 text-slate-400 shrink-0" />
+                    <CalendarDays className="w-4 h-4 text-gray-400 shrink-0" />
                     <input
                       type="date"
                       value={newDeadline}
                       min={today}
                       onChange={(e) => setNewDeadline(e.target.value)}
-                      className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                      className="flex-1 px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5b7a95]"
                     />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Flag className="w-4 h-4 text-slate-400 shrink-0" />
+                    <Flag className="w-4 h-4 text-gray-400 shrink-0" />
                     <select
                       value={newPriority}
                       onChange={(e) => setNewPriority(e.target.value as Priority)}
-                      className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                      className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5b7a95]"
                     >
                       <option value="high">優先度：高</option>
                       <option value="medium">優先度：中</option>
@@ -264,7 +264,7 @@ export default function TodoApp({ session }: { session: Session }) {
                   <button
                     onClick={addTodo}
                     disabled={!newTitle.trim()}
-                    className="px-5 py-2 bg-slate-600 hover:bg-slate-700 disabled:opacity-40 text-white text-sm font-medium rounded-xl transition-colors"
+                    className="px-5 py-2 btn-accent  disabled:opacity-40 text-white text-sm font-medium rounded-xl transition-colors"
                   >
                     追加する
                   </button>
@@ -314,24 +314,24 @@ export default function TodoApp({ session }: { session: Session }) {
                           onChange={(e) => setEditTitle(e.target.value)}
                           onKeyDown={(e) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) saveEdit(); if (e.key === "Escape") cancelEdit(); }}
                           autoFocus
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-gray-50 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#5b7a95]"
                         />
                         <div className="flex gap-3">
                           <div className="flex items-center gap-2 flex-1">
-                            <CalendarDays className="w-4 h-4 text-slate-400 shrink-0" />
+                            <CalendarDays className="w-4 h-4 text-gray-400 shrink-0" />
                             <input
                               type="date"
                               value={editDeadline}
                               onChange={(e) => setEditDeadline(e.target.value)}
-                              className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                              className="flex-1 px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5b7a95]"
                             />
                           </div>
                           <div className="flex items-center gap-2">
-                            <Flag className="w-4 h-4 text-slate-400 shrink-0" />
+                            <Flag className="w-4 h-4 text-gray-400 shrink-0" />
                             <select
                               value={editPriority}
                               onChange={(e) => setEditPriority(e.target.value as Priority)}
-                              className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                              className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5b7a95]"
                             >
                               <option value="high">優先度：高</option>
                               <option value="medium">優先度：中</option>
@@ -349,7 +349,7 @@ export default function TodoApp({ session }: { session: Session }) {
                           <button
                             onClick={saveEdit}
                             disabled={!editTitle.trim()}
-                            className="flex items-center gap-1 px-4 py-1.5 bg-slate-600 hover:bg-slate-700 disabled:opacity-40 text-white text-xs font-medium rounded-lg transition-colors"
+                            className="flex items-center gap-1 px-4 py-1.5 btn-accent  disabled:opacity-40 text-white text-xs font-medium rounded-lg transition-colors"
                           >
                             <Check className="w-3.5 h-3.5" /> 保存
                           </button>
@@ -362,9 +362,9 @@ export default function TodoApp({ session }: { session: Session }) {
                           className="mt-0.5 shrink-0 transition-transform hover:scale-110"
                         >
                           {todo.completed ? (
-                            <CheckCircle2 className="w-5 h-5 text-slate-500" />
+                            <CheckCircle2 className="w-5 h-5 text-[#5b7a95]" />
                           ) : (
-                            <Circle className="w-5 h-5 text-gray-300 hover:text-slate-400" />
+                            <Circle className="w-5 h-5 text-gray-300 hover:text-gray-400" />
                           )}
                         </button>
                         <div className="flex-1 min-w-0">
@@ -399,7 +399,7 @@ export default function TodoApp({ session }: { session: Session }) {
                         <div className="flex items-center gap-1 shrink-0">
                           <button
                             onClick={() => startEdit(todo)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-slate-500 hover:bg-slate-50 transition-colors"
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-[#5b7a95] hover:bg-gray-50 transition-colors"
                             aria-label="編集"
                           >
                             <Pencil className="w-3.5 h-3.5" />

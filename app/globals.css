@@ -10,8 +10,18 @@
 
 body {
   font-family: var(--font-geist), "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  background: linear-gradient(135deg, #5b7a95 0%, #8aaec8 100%);
   min-height: 100vh;
+}
+
+.btn-accent {
+  background-color: #5b7a95;
+}
+.btn-accent:hover {
+  background-color: #4a6a84;
+}
+.ring-accent:focus {
+  --tw-ring-color: #5b7a95;
 }
 
 .glass {

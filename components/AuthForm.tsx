@@ -53,7 +53,7 @@ export default function AuthForm() {
                 key={m}
                 onClick={() => { setMode(m); setError(null); setMessage(null); }}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-                  mode === m ? "bg-white text-slate-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  mode === m ? "bg-white text-[#5b7a95] shadow-sm" : "text-gray-500 hover:text-gray-700"
                 }`}
               >
                 {m === "login" ? "ログイン" : "新規登録"}
@@ -70,7 +70,7 @@ export default function AuthForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 placeholder="example@email.com"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5b7a95]"
               />
             </div>
             <div>
@@ -81,7 +81,7 @@ export default function AuthForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 placeholder="6文字以上"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5b7a95]"
               />
             </div>
 
@@ -99,7 +99,7 @@ export default function AuthForm() {
             <button
               onClick={handleSubmit}
               disabled={loading || !email.trim() || !password.trim()}
-              className="w-full py-2.5 bg-slate-600 hover:bg-slate-700 disabled:opacity-40 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+              className="w-full py-2.5 btn-accent  disabled:opacity-40 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
             >
               {loading ? "処理中..." : mode === "login" ? "ログイン" : "アカウントを作成"}
             </button>
